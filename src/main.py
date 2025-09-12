@@ -1,6 +1,6 @@
 from portfolio.portfolio_manager import PortfolioManager
 from data.data_collector import DataCollector
-from data.data_preprocessor import DataPreprocessor
+#from data.data_preprocessor import DataPreprocessor
 from database.db_connection import DatabaseConnection
 from datetime import datetime, timedelta
 import time
