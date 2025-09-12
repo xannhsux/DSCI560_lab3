@@ -1,4 +1,4 @@
-l
+
 -- Create
 database tables
 USE stock_analysis;
