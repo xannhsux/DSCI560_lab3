@@ -1,24 +1,30 @@
 version: '3.8'
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.4
     container_name: stock_mysql
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: stock_analysis
       MYSQL_USER: stock_user
       MYSQL_PASSWORD: stock_password
-    ports:
-      - "3306:3306"
+    # 不占用宿主机端口；容器间可见
+    expose:
+      - "3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql:/docker-entrypoint-initdb.d
     networks:
       - stock_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prootpassword"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
     restart: unless-stopped
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+    image: phpmyadmin:latest
     container_name: stock_phpmyadmin
     environment:
       PMA_HOST: mysql
@@ -26,9 +32,10 @@ services:
       PMA_USER: root
       PMA_PASSWORD: rootpassword
     ports:
-      - "8080:80"
+      - "8080:80"   # http://localhost:8080
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - stock_network
     restart: unless-stopped
@@ -39,8 +46,15 @@ services:
     volumes:
       - ./src:/app/src
       - ./config:/app/config
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: stock_analysis
+      DB_USER: stock_user
+      DB_PASSWORD: stock_password
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - stock_network
     stdin_open: true
