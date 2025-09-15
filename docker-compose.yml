@@ -42,7 +42,7 @@ services:
     build: .
     container_name: stock_python_app
     volumes:
-      - ./src:/app/src
+#      - ./src:/app/src
       - ./config:/app/config
     environment:
       DB_HOST: mysql
@@ -57,7 +57,7 @@ services:
       - stock_network
     stdin_open: true
     tty: true
-    command: tail -f /dev/null
+    command: python src/main.py
     restart: unless-stopped
 
 volumes:
