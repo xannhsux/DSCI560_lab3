@@ -75,6 +75,12 @@ def fetch_and_predict(symbol):
             dc = DataCollector()
             dc.fetch_stock_data(symbol, period='1y')
             
+            # Refresh DB connection to pick up newly inserted history
+            db.disconnect()
+            if not db.connect():
+                print("Failed to reconnect to database after data fetch")
+                return None
+
             # Retry query
             data_result = db.execute_query(data_query, (stock_id,))
             
@@ -112,6 +118,14 @@ def fetch_and_predict(symbol):
             max_d=2,
             max_q=3
         )
+
+        if model is None:
+            print("Failed to fit ARIMA model; skipping predictions")
+            return None
+
+        # Persist fitted model/order so prediction step can run
+        arima.model = model
+        arima.best_order = optimal_order
         
         # Make predictions
         print("\n3. GENERATING PREDICTIONS")
@@ -174,7 +188,7 @@ def analyze_portfolio(portfolio_id):
     
     if not stocks:
         print(f"No stocks found in portfolio {portfolio_id}")
-        return {}
+        return None
     
     print(f"\nAnalyzing portfolio {portfolio_id} with {len(stocks)} stocks")
     
@@ -264,8 +278,12 @@ def main():
         try:
             portfolio_id = int(input("\nEnter Portfolio ID: "))
             results = analyze_portfolio(portfolio_id)
-            if results:
+            if results is None:
+                print("\n⚠️ No stocks in this portfolio. Add holdings before running ARIMA.")
+            elif results:
                 print("\n✅ Portfolio analysis complete!")
+            else:
+                print("\n❌ Portfolio analysis failed to generate any results")
         except ValueError:
             print("Invalid portfolio ID")
     

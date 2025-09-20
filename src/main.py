@@ -885,7 +885,9 @@ class StockAnalysisApp:
             print("\nRunning ARIMA analysis...")
             results = analyze_portfolio(portfolio_id)
             
-            if results:
+            if results is None:
+                print("\n⚠️ No stocks in this portfolio. Add holdings before running ARIMA.")
+            elif results:
                 print("\n✅ ARIMA analysis complete!")
             else:
                 print("\n❌ ARIMA analysis failed")

@@ -122,8 +122,17 @@ class ARIMAPortfolioTrader:
             print("Insufficient data for ARIMA training")
             return None
         
-        # Train model
-        model = self.arima_algo.fit_arima(price_data)
+        # Determine optimal order and reuse fitted model from grid search
+        optimal_order, model, _ = self.arima_algo.find_optimal_order(price_data)
+
+        if model is None:
+            print("Failed to fit ARIMA model with available data")
+            return None
+
+        # Persist fitted model so downstream predictions use it directly
+        self.arima_algo.model = model
+
+        print(f"\n✓ ARIMA{optimal_order} model fitted successfully")
         
         return model
     
