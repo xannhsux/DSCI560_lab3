@@ -52,6 +52,8 @@ class StockAnalysisApp:
             elif choice == '12':
                 self.calculate_daily_returns_flow()
             elif choice == '13':
+                self.run_arima_trading()
+            elif choice == '14':
                 print("Thank you for using the Stock Analysis System!")
                 break
             else:
@@ -76,7 +78,8 @@ class StockAnalysisApp:
         print("10. Update Stock Metadata")
         print("11. Update Price Data (All Stocks)")
         print("12. Calculate Daily Returns (All Stocks)")
-        print("13. Exit")
+        print("13. Run ARIMA Trading Algorithm") 
+        print("14. Exit")
 
     def create_portfolio_flow(self):
         """Create a new portfolio"""
@@ -864,6 +867,34 @@ class StockAnalysisApp:
             print("Invalid portfolio ID")
         except Exception as e:
             print(f"Error: {e}")
+
+    def run_arima_trading(self):
+        """Run ARIMA trading algorithm"""
+        print("\n--- ARIMA Trading Algorithm ---")
+        
+        # Import ARIMA module
+        from trading.arima_algorithm import ARIMATradingAlgorithm
+        from scripts.run_arima_trading import analyze_portfolio
+        
+        # Display portfolios
+        self.portfolio_manager.display_all_portfolios()
+        
+        try:
+            portfolio_id = int(input("\nEnter Portfolio ID for ARIMA analysis: "))
+            
+            print("\nRunning ARIMA analysis...")
+            results = analyze_portfolio(portfolio_id)
+            
+            if results:
+                print("\n✅ ARIMA analysis complete!")
+            else:
+                print("\n❌ ARIMA analysis failed")
+                
+        except ValueError:
+            print("Invalid portfolio ID")
+        except Exception as e:
+            print(f"Error: {e}")
+
 
 if __name__ == "__main__":
     app = StockAnalysisApp()
