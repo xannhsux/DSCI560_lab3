@@ -299,12 +299,16 @@ class ARIMATradingAlgorithm:
             'shares': 0,
             'total_value': initial_capital,
             'trades': [],
-            'portfolio_values': []
+            'portfolio_values': [],
+            'share_history': [],
+            'cash_history': [],
+            'timeline': []
         }
-        
+
         # Simulate trading
         for i in range(len(test_data) - self.prediction_horizon):
             current_price = test_data.iloc[i]
+            current_date = test_data.index[i]
             
             # Retrain model with expanding window (optional, computationally expensive)
             # For now, use initial model
@@ -326,7 +330,7 @@ class ARIMATradingAlgorithm:
                     portfolio['cash'] -= cost
                     
                     portfolio['trades'].append({
-                        'date': i,
+                        'date': current_date,
                         'action': 'BUY',
                         'price': current_price,
                         'shares': shares_to_buy,
@@ -339,7 +343,7 @@ class ARIMATradingAlgorithm:
                 portfolio['cash'] += revenue
                 
                 portfolio['trades'].append({
-                    'date': i,
+                    'date': current_date,
                     'action': 'SELL',
                     'price': current_price,
                     'shares': portfolio['shares'],
@@ -351,6 +355,9 @@ class ARIMATradingAlgorithm:
             # Calculate portfolio value
             portfolio['total_value'] = portfolio['cash'] + portfolio['shares'] * current_price
             portfolio['portfolio_values'].append(portfolio['total_value'])
+            portfolio['share_history'].append(portfolio['shares'])
+            portfolio['cash_history'].append(portfolio['cash'])
+            portfolio['timeline'].append(current_date)
         
         # Calculate final metrics
         final_value = portfolio['total_value']

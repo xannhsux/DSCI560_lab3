@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import time
 
 class StockAnalysisApp:
+    
     def __init__(self):
         self.portfolio_manager = PortfolioManager()
         self.data_collector = DataCollector()
