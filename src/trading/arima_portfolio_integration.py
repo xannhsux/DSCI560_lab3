@@ -131,6 +131,7 @@ class ARIMAPortfolioTrader:
 
         # Persist fitted model so downstream predictions use it directly
         self.arima_algo.model = model
+        self.arima_algo.best_order = optimal_order
 
         print(f"\n✓ ARIMA{optimal_order} model fitted successfully")
         
